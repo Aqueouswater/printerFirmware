@@ -4,7 +4,7 @@
 //===========================================================================
 //=============================Thermal Settings  ============================
 //===========================================================================
-
+//
 #ifdef BED_LIMIT_SWITCHING
   #define BED_HYSTERESIS 2 //only disable heating if T>target+BED_HYSTERESIS and enable heating if T>target-BED_HYSTERESIS
 #endif
