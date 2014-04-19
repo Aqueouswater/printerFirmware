@@ -221,9 +221,9 @@
 
 //Plastibot Prusa Heater - 60*c
 //Use this one
-    #define  DEFAULT_bedKp 107.33
-    #define  DEFAULT_bedKi 14.12
-    #define  DEFAULT_bedKd 203.98
+    #define  DEFAULT_bedKp 930.91
+    #define  DEFAULT_bedKi 95.33
+    #define  DEFAULT_bedKd 2272.59
 
 //120v 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
 //from FOPDT model - kp=.39 Tp=405 Tdead=66, Tc set to 79.2, aggressive factor of .15 (vs .1, 1, 10)
