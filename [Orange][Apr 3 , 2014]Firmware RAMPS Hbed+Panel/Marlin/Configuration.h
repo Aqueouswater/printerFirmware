@@ -80,7 +80,7 @@
 #endif
 
 // Define this to set a custom name for your generic Mendel,
- #define CUSTOM_MENDEL_NAME "Orange Printer"
+ #define CUSTOM_MENDEL_NAME "3D Printer"
 
 // Define this to set a unique identifier for this printer, (Used by some programs to differentiate between machines)
 // You can use an online service to generate a random UUID. (eg http://www.uuidgenerator.net/version4)
@@ -183,9 +183,9 @@
 //    #define  DEFAULT_Kd 114
 
 // Makergear
-    #define  DEFAULT_Kp 7.0
-    #define  DEFAULT_Ki 0.1
-    #define  DEFAULT_Kd 12
+    #define  DEFAULT_Kp 63.76
+    #define  DEFAULT_Ki 8.61
+    #define  DEFAULT_Kd 118.04
 
 // Mendel Parts V9 on 12V
 //    #define  DEFAULT_Kp 63.0
