@@ -16,7 +16,7 @@
 // startup. Implementation of an idea by Prof Braino to inform user that any changes made to this
 // build by the user have been successfully uploaded into firmware.
 #define STRING_VERSION_CONFIG_H __DATE__ " " __TIME__ // build date and time
-#define STRING_CONFIG_H_AUTHOR "(jcrocholl, Mini Kossel)" // Who made the changes.
+#define STRING_CONFIG_H_AUTHOR "(none, default config)" // Who made the changes.
 
 // SERIAL_PORT selects which serial port should be used for communication with the host.
 // This allows the connection of wireless adapters (for instance) to non-default port pins.
@@ -106,16 +106,16 @@
 // NOTE NB all values for DELTA_* values MUST be floating point, so always have a decimal point in them
 
 // Center-to-center distance of the holes in the diagonal push rods.
-#define DELTA_DIAGONAL_ROD 250.0 // mm
+#define DELTA_DIAGONAL_ROD 290.0 // mm
 
 // Horizontal offset from middle of printer to smooth rod center.
-#define DELTA_SMOOTH_ROD_OFFSET 175.0 // mm
+#define DELTA_SMOOTH_ROD_OFFSET 220.0 // mm
 
 // Horizontal offset of the universal joints on the end effector.
 #define DELTA_EFFECTOR_OFFSET 33.0 // mm
 
 // Horizontal offset of the universal joints on the carriages.
-#define DELTA_CARRIAGE_OFFSET 18.0 // mm
+#define DELTA_CARRIAGE_OFFSET 28.0 // mm
 
 // Effective horizontal distance bridged by diagonal push rods.
 #define DELTA_RADIUS (DELTA_SMOOTH_ROD_OFFSET-DELTA_EFFECTOR_OFFSET-DELTA_CARRIAGE_OFFSET)
@@ -234,7 +234,7 @@
 // If your configuration is significantly different than this and you don't understand the issues involved, you probably
 // shouldn't use bed PID until someone else verifies your hardware works.
 // If this is enabled, find your own PID constants below.
-//#define PIDTEMPBED
+#define PIDTEMPBED
 //
 //#define BED_LIMIT_SWITCHING
 
@@ -247,9 +247,9 @@
 #ifdef PIDTEMPBED
 //120v 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
 //from FOPDT model - kp=.39 Tp=405 Tdead=66, Tc set to 79.2, aggressive factor of .15 (vs .1, 1, 10)
-    #define  DEFAULT_bedKp 10.00
-    #define  DEFAULT_bedKi .023
-    #define  DEFAULT_bedKd 305.4
+    #define  DEFAULT_bedKp 218.50
+    #define  DEFAULT_bedKi 12.63
+    #define  DEFAULT_bedKd 945.09
 
 //120v 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
 //from pidautotune
@@ -326,7 +326,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 #define DISABLE_Y false
 #define DISABLE_Z false
 #define DISABLE_E false // For all extruders
-#define DISABLE_INACTIVE_EXTRUDER true
+#define DISABLE_INACTIVE_EXTRUDER true //disable only inactive extruders and keep active extruder enabled
 
 #define INVERT_X_DIR false // DELTA does not invert
 #define INVERT_Y_DIR false
@@ -347,10 +347,10 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 #define max_software_endstops true  // If true, axis won't move to coordinates greater than the defined lengths below.
 
 // Travel limits after homing
-#define X_MAX_POS 90
-#define X_MIN_POS -90
-#define Y_MAX_POS 90
-#define Y_MIN_POS -90
+#define X_MAX_POS 200
+#define X_MIN_POS -200
+#define Y_MAX_POS 200
+#define Y_MIN_POS -200
 #define Z_MAX_POS MANUAL_Z_HOME_POS
 #define Z_MIN_POS 0
 
@@ -359,15 +359,54 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 #define Z_MAX_LENGTH (Z_MAX_POS - Z_MIN_POS)
 //============================= Bed Auto Leveling ===========================
 
-//#define ENABLE_AUTO_BED_LEVELING // Delete the comment to enable (remove // at the start of the line)
+#define ENABLE_AUTO_BED_LEVELING // Delete the comment to enable (remove // at the start of the line)
+#define Z_PROBE_REPEATABILITY_TEST  // If not commented out, Z-Probe Repeatability test will be included if Auto Bed Leveling is Enabled.
 
 #ifdef ENABLE_AUTO_BED_LEVELING
 
-  // these are the positions on the bed to do the probing
-  #define LEFT_PROBE_BED_POSITION 15
-  #define RIGHT_PROBE_BED_POSITION 170
-  #define BACK_PROBE_BED_POSITION 180
-  #define FRONT_PROBE_BED_POSITION 20
+// There are 2 different ways to pick the X and Y locations to probe:
+
+//  - "grid" mode
+//    Probe every point in a rectangular grid
+//    You must specify the rectangle, and the density of sample points
+//    This mode is preferred because there are more measurements.
+//    It used to be called ACCURATE_BED_LEVELING but "grid" is more descriptive
+
+//  - "3-point" mode
+//    Probe 3 arbitrary points on the bed (that aren't colinear)
+//    You must specify the X & Y coordinates of all 3 points
+
+  #define AUTO_BED_LEVELING_GRID
+  // with AUTO_BED_LEVELING_GRID, the bed is sampled in a
+  // AUTO_BED_LEVELING_GRID_POINTSxAUTO_BED_LEVELING_GRID_POINTS grid
+  // and least squares solution is calculated
+  // Note: this feature occupies 10'206 byte
+  #ifdef AUTO_BED_LEVELING_GRID
+
+    // set the rectangle in which to probe
+    #define LEFT_PROBE_BED_POSITION 15
+    #define RIGHT_PROBE_BED_POSITION 170
+    #define BACK_PROBE_BED_POSITION 180
+    #define FRONT_PROBE_BED_POSITION 20
+
+     // set the number of grid points per dimension
+     // I wouldn't see a reason to go above 3 (=9 probing points on the bed)
+    #define AUTO_BED_LEVELING_GRID_POINTS 3
+
+
+  #else  // not AUTO_BED_LEVELING_GRID
+    // with no grid, just probe 3 arbitrary points.  A simple cross-product
+    // is used to esimate the plane of the print bed
+
+      #define ABL_PROBE_PT_1_X 15
+      #define ABL_PROBE_PT_1_Y 180
+      #define ABL_PROBE_PT_2_X 15
+      #define ABL_PROBE_PT_2_Y 20
+      #define ABL_PROBE_PT_3_X 170
+      #define ABL_PROBE_PT_3_Y 20
+
+  #endif // AUTO_BED_LEVELING_GRID
+
 
   // these are the offsets to the probe relative to the extruder tip (Hotend - Probe)
   #define X_PROBE_OFFSET_FROM_EXTRUDER 0
@@ -382,6 +421,8 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
   #define Z_RAISE_BEFORE_PROBING 15    //How much the extruder will be raised before traveling to the first probing point.
   #define Z_RAISE_BETWEEN_PROBINGS 5  //How much the extruder will be raised when traveling from between next probing points
 
+  //#define Z_PROBE_SLED // turn on if you have a z-probe mounted on a sled like those designed by Charles Bell
+  //#define SLED_DOCKING_OFFSET 5 // the extra distance the X axis must travel to pickup the sled. 0 should be fine but you can push it further if you'd like.
 
   //If defined, the Probe servo will be turned on only during movement and then turned off to avoid jerk
   //The value is the delay to turn the servo off after powered on - depends on the servo speed; 300ms is good value, but you can try lower it.
@@ -407,11 +448,11 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 
   #endif
 
-#endif
+#endif // ENABLE_AUTO_BED_LEVELING
 
 
 // The position of the homing switches
-//#define MANUAL_HOME_POSITIONS  // If defined, MANUAL_*_HOME_POS below will be used
+#define MANUAL_HOME_POSITIONS  // If defined, MANUAL_*_HOME_POS below will be used
 //#define BED_CENTER_AT_0_0  // If defined, the center of the bed is at (X=0, Y=0)
 
 //Manual homing switch locations:
@@ -426,13 +467,13 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 #define NUM_AXIS 4 // The axis order in all axis related arrays is X, Y, Z, E
 
 // delta homing speeds must be the same on xyz
-#define HOMING_FEEDRATE {200*60, 200*60, 200*60, 0}  // set the homing speeds (mm/min)
+#define HOMING_FEEDRATE {4000, 4000, 4000, 0}  // set the homing speeds (mm/min)
 
 // default settings
 // delta speeds must be the same on xyz
 #define DEFAULT_AXIS_STEPS_PER_UNIT   {80, 80, 80, 100}  // default steps per unit for Kossel (GT2, 20 tooth)
 #define DEFAULT_MAX_FEEDRATE          {200, 200, 200, 25}    // (mm/sec)
-#define DEFAULT_MAX_ACCELERATION      {9000,9000,9000,10000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for skeinforge 40+, for older versions raise them a lot.
+#define DEFAULT_MAX_ACCELERATION      {3000,3000,3000,10000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for skeinforge 40+, for older versions raise them a lot.
 
 #define DEFAULT_ACCELERATION          3000    // X, Y, Z and E max acceleration in mm/s^2 for printing moves
 #define DEFAULT_RETRACT_ACCELERATION  3000   // X, Y, Z and E max acceleration in mm/s^2 for retracts
@@ -458,10 +499,10 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 // M501 - reads parameters from EEPROM (if you need reset them after you changed them temporarily).
 // M502 - reverts to the default "factory settings".  You still need to store them in EEPROM afterwards if you want to.
 //define this to enable EEPROM support
-//#define EEPROM_SETTINGS
+#define EEPROM_SETTINGS
 //to disable EEPROM Serial responses and decrease program space by ~1700 byte: comment this out:
 // please keep turned on if you can.
-//#define EEPROM_CHITCHAT
+#define EEPROM_CHITCHAT
 
 // Preheat Constants
 #define PLA_PREHEAT_HOTEND_TEMP 172
